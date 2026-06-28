@@ -101,6 +101,12 @@ body{font-family:'Inter','IBM Plex Sans Arabic','IBM Plex Mono',sans-serif;backg
 .result-title{font-size:1.3rem;font-weight:900;margin-bottom:6px}
 .result-sub{font-size:.9rem;color:var(--gray);line-height:1.6}
 .result-slot{display:inline-block;margin-top:14px;font-weight:800;color:var(--accent);background:var(--accent-dim);padding:8px 18px;border-radius:99px;font-size:.9rem}
+.result-meet{margin-top:20px;padding-top:18px;border-top:1px solid var(--card-border)}
+.result-meet-label{font-size:.86rem;color:var(--white);font-weight:600;margin-bottom:12px;line-height:1.5}
+.meet-btn{display:inline-flex;align-items:center;gap:9px;padding:12px 26px;border-radius:10px;background:var(--accent);color:var(--bg);font-size:.95rem;font-weight:800;font-family:'Inter',sans-serif;text-decoration:none;transition:all .25s}
+.meet-btn:hover{box-shadow:0 0 24px var(--accent-glow);transform:translateY(-1px)}
+.meet-btn svg{display:block}
+.result-meet-url{margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--gray);letter-spacing:.3px}
 .submit-status{font-size:.85rem;color:var(--gray);margin-top:10px}
 .submit-status.success{color:var(--correct)}
 .submit-status.error{color:var(--danger)}
@@ -203,6 +209,14 @@ body{font-family:'Inter','IBM Plex Sans Arabic','IBM Plex Mono',sans-serif;backg
     <div class="result-title" id="resultTitle">Interview Booked!</div>
     <div class="result-sub" id="resultSub">Your interview slot is reserved.<br>Please make sure to be exactly on time, because we don't want any interference with other participants.</div>
     <div class="result-slot hidden" id="resultSlot"></div>
+    <div class="result-meet hidden" id="resultMeet">
+      <div class="result-meet-label">Join your interview on Google Meet — at your exact slot time:</div>
+      <a class="meet-btn" id="meetLink" href="https://meet.google.com/aqs-oyia-gsm" target="_blank" rel="noopener noreferrer">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--bg)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M15 10l4.553-2.276A1 1 0 0 1 21 8.618v6.764a1 1 0 0 1-1.447.894L15 14v-4z"/><rect x="3" y="6" width="12" height="12" rx="2" ry="2"/></svg>
+        <span>Join Google Meet</span>
+      </a>
+      <div class="result-meet-url">meet.google.com/aqs-oyia-gsm</div>
+    </div>
     <div class="submit-status" id="submitStatus"></div>
   </div>
 
@@ -491,6 +505,8 @@ function showResult(kind, message, slot) {
   const slotBadge = document.getElementById('resultSlot');
   const status = document.getElementById('submitStatus');
 
+  document.getElementById('resultMeet').classList.add('hidden');   // only shown on success
+
   if (kind === 'success') {
     results.classList.remove('failed');
     icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--correct)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -498,6 +514,7 @@ function showResult(kind, message, slot) {
     sub.innerHTML = "Your interview slot is reserved.<br>Please make sure to be exactly on time, because we don't want any interference with other participants.";
     slotBadge.textContent = slot.dayId + '  •  ' + slot.time;
     slotBadge.classList.remove('hidden');
+    document.getElementById('resultMeet').classList.remove('hidden');   // show Meet link
     status.textContent = message;
     status.className = 'submit-status success';
     document.getElementById('submitWrap').classList.add('hidden');

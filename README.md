@@ -21,6 +21,8 @@ Two interview days, **8 slots each**, **20 minutes per slot**, running **9:00 PM
 
 Once a candidate books a slot, that card is disabled for everyone else — enforced server-side with `LockService` so two people can never grab the same slot.
 
+After a successful booking, the confirmation screen shows the **Google Meet link** (`meet.google.com/aqs-oyia-gsm`) and reminds the candidate to join **at their exact slot time** so interviews don't overlap.
+
 ## 🛠️ Tech Stack
 
 - **Frontend:** Single-file HTML/CSS/JS — no frameworks, no dependencies
