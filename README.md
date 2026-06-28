@@ -6,7 +6,7 @@
 
 ## 🗓️ Schedule
 
-Two interview days, **6 slots each**, **20 minutes per slot**, running **9:00 PM → 11:00 PM**:
+Two interview days, **7 slots each** (6 + 1 extra), **20 minutes per slot**, running **9:00 PM → 11:20 PM**:
 
 | Day 1 — 29/6 | Day 2 — 30/6 |
 |--------------|--------------|
@@ -16,6 +16,7 @@ Two interview days, **6 slots each**, **20 minutes per slot**, running **9:00 PM
 | 10:00 – 10:20 PM | 10:00 – 10:20 PM |
 | 10:20 – 10:40 PM | 10:20 – 10:40 PM |
 | 10:40 – 11:00 PM | 10:40 – 11:00 PM |
+| 11:00 – 11:20 PM | 11:00 – 11:20 PM |
 
 Once a candidate books a slot, that card is disabled for everyone else — enforced server-side with `LockService` so two people can never grab the same slot.
 

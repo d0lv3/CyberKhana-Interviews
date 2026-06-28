@@ -201,7 +201,7 @@ body{font-family:'Inter','IBM Plex Sans Arabic','IBM Plex Mono',sans-serif;backg
   <div class="results hidden" id="results">
     <div class="success-icon" id="resultIcon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--correct)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><polyline points="20 6 9 17 4 12"/></svg></div>
     <div class="result-title" id="resultTitle">Interview Booked!</div>
-    <div class="result-sub" id="resultSub">Your interview slot is reserved.<br>We'll see you then — keep an eye on your contact channel for any updates.</div>
+    <div class="result-sub" id="resultSub">Your interview slot is reserved.<br>Please make sure to be exactly on time, because we don't want any interference with other participants.</div>
     <div class="result-slot hidden" id="resultSlot"></div>
     <div class="submit-status" id="submitStatus"></div>
   </div>
@@ -235,14 +235,15 @@ const DAYS = [
   { id: "30/6", name: "Day 2", date: "Mon, 30 June" }
 ];
 
-// 6 slots of 20 minutes from 9:00 PM to 11:00 PM
+// 7 slots of 20 minutes from 9:00 PM to 11:20 PM (6 + 1 extra slot per day)
 const SLOT_TIMES = [
   "9:00 PM – 9:20 PM",
   "9:20 PM – 9:40 PM",
   "9:40 PM – 10:00 PM",
   "10:00 PM – 10:20 PM",
   "10:20 PM – 10:40 PM",
-  "10:40 PM – 11:00 PM"
+  "10:40 PM – 11:00 PM",
+  "11:00 PM – 11:20 PM"
 ];
 
 // Build a unique key for a given day + time, used as the slot's identity.
@@ -493,7 +494,7 @@ function showResult(kind, message, slot) {
     results.classList.remove('failed');
     icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--correct)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><polyline points="20 6 9 17 4 12"/></svg>';
     title.textContent = 'Interview Booked!';
-    sub.innerHTML = "Your interview slot is reserved.<br>We'll see you then — keep an eye on your contact channel for any updates.";
+    sub.innerHTML = "Your interview slot is reserved.<br>Please make sure to be exactly on time, because we don't want any interference with other participants.";
     slotBadge.textContent = slot.dayId + '  •  ' + slot.time;
     slotBadge.classList.remove('hidden');
     status.textContent = message;
