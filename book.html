@@ -366,6 +366,38 @@ function showError(id) {
 }
 
 // ---- Load taken slots from the backend ------------------------------------
+let pollTimer = null;       // handle for the 3s poll
+let pollInFlight = false;   // avoid overlapping requests
+let pollPaused = false;     // pause while submitting / after booking
+
+// Fetch the latest booked slots and reflect them in the UI.
+// Returns a promise so the initial load can reveal the panels when done.
+function refreshTakenSlots() {
+  if (SCRIPT_URL === "YOUR_SCRIPT_URL_HERE") return Promise.resolve();
+  if (pollInFlight || pollPaused) return Promise.resolve();
+  pollInFlight = true;
+
+  return fetch(SCRIPT_URL + '?action=taken', { method: 'GET' })
+    .then(r => r.json())
+    .then(data => {
+      takenSlots = {};
+      (data.taken || []).forEach(k => { takenSlots[k] = true; });
+      applyTaken();   // disables taken cards; clears selection if it got taken
+    })
+    .catch(() => { /* fail open — keep whatever we have so booking still works */ })
+    .finally(() => { pollInFlight = false; });
+}
+
+function startPolling() {
+  if (pollTimer || SCRIPT_URL === "YOUR_SCRIPT_URL_HERE") return;
+  // Re-check the GS endpoint every 3 seconds for slots booked by others.
+  pollTimer = setInterval(refreshTakenSlots, 3000);
+}
+
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
 function loadTakenSlots() {
   const loading = document.getElementById('slotsLoading');
   const panels = document.getElementById('slotPanels');
@@ -381,18 +413,11 @@ function loadTakenSlots() {
     return;
   }
 
-  fetch(SCRIPT_URL + '?action=taken', { method: 'GET' })
-    .then(r => r.json())
-    .then(data => {
-      takenSlots = {};
-      (data.taken || []).forEach(k => { takenSlots[k] = true; });
-      applyTaken();
-      reveal();
-    })
-    .catch(() => {
-      // On error, fail open (show all available) so booking still works.
-      reveal();
-    });
+  // Initial load, then start the 3s background refresh.
+  refreshTakenSlots().then(() => {
+    reveal();
+    startPolling();
+  });
 }
 
 // ---- Submit ---------------------------------------------------------------
@@ -420,6 +445,7 @@ function submitForm() {
   const btn = document.getElementById('submitBtn');
   btn.classList.add('loading');
   btn.disabled = true;
+  pollPaused = true;   // don't let the 3s poll interfere mid-submit
   document.querySelectorAll('.text-input').forEach(i => i.disabled = true);
   document.querySelectorAll('.slot, .day-tab').forEach(o => o.style.pointerEvents = 'none');
 
@@ -473,6 +499,7 @@ function showResult(kind, message, slot) {
     status.textContent = message;
     status.className = 'submit-status success';
     document.getElementById('submitWrap').classList.add('hidden');
+    stopPolling();   // booking confirmed — no need to keep checking
   } else if (kind === 'taken') {
     results.classList.add('failed');
     icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
@@ -491,6 +518,7 @@ function showResult(kind, message, slot) {
       applyTaken();
       selectedSlot = null;
       updateProgress();
+      pollPaused = false;   // resume the 3s poll so they pick a fresh slot
     }, 2600);
   } else if (kind === 'warn') {
     results.classList.remove('failed');
@@ -512,6 +540,7 @@ function showResult(kind, message, slot) {
     btn.disabled = false;
     document.querySelectorAll('.text-input').forEach(i => i.disabled = false);
     document.querySelectorAll('.slot, .day-tab').forEach(o => o.style.pointerEvents = '');
+    pollPaused = false;   // resume the 3s poll so a retry sees fresh data
   }
 
   results.classList.remove('hidden');
