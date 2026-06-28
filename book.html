@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Your Interview — CyberKhana</title>
+<meta name="description" content="Book your CyberKhana interview slot. Choose your day and time.">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b0f1a;--card:#121829;--card-border:#1c2537;--accent:#a3e635;--accent-dim:rgba(163,230,53,.12);--accent-glow:rgba(163,230,53,.2);--white:#f1f5f9;--gray:#94a3b8;--dark-gray:#475569;--danger:#ef4444;--correct:#22c55e;--wrong:#ef4444}
+body{font-family:'Inter','IBM Plex Sans Arabic','IBM Plex Mono',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;line-height:1.7}
+.container{max-width:720px;margin:0 auto;padding:16px;position:relative;z-index:1}
+
+/* Nav */
+.nav{display:flex;align-items:center;justify-content:flex-start;padding:14px 0;margin-bottom:24px;border-bottom:1px solid var(--card-border);direction:ltr}
+.nav-logo img{height:44px;width:auto;display:block}
+
+/* Hero */
+.hero{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:36px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),transparent)}
+.hero-session{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;color:var(--accent);background:var(--accent-dim);padding:5px 14px;border-radius:99px;margin-bottom:16px;letter-spacing:.5px;font-family:'Inter',sans-serif}
+.hero-session::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-family:'Inter','IBM Plex Sans Arabic',sans-serif;font-weight:900;font-size:clamp(1.4rem,5vw,2rem);color:var(--white);line-height:1.3}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{color:var(--gray);font-size:.9rem;margin-top:8px}
+
+/* Progress */
+.progress-wrap{background:var(--card);border:1px solid var(--card-border);border-radius:12px;padding:14px 18px;margin-bottom:22px}
+.progress-info{display:flex;justify-content:space-between;font-size:.8rem;color:var(--gray);margin-bottom:8px;font-weight:600}
+.progress-bar{height:5px;background:#1e293b;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:var(--accent);border-radius:99px;transition:width .5s ease;box-shadow:0 0 10px var(--accent-glow)}
+
+/* Field cards */
+.field-card{background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:22px;margin-bottom:14px;transition:border-color .3s,box-shadow .3s;animation:fadeIn .4s ease both}
+.field-card:hover{border-color:#2a3650}
+.field-card.completed{border-color:var(--correct);box-shadow:0 0 16px rgba(34,197,94,.1)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.field-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.field-num{font-family:'Inter',sans-serif;font-weight:800;font-size:.8rem;color:var(--bg);background:var(--accent);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.field-req{font-size:.7rem;color:var(--danger);font-weight:700;letter-spacing:.5px}
+.field-label{font-size:1rem;font-weight:700;margin-bottom:14px;line-height:1.8}
+.field-sublabel{font-size:.82rem;color:var(--gray);margin-top:-8px;margin-bottom:14px}
+
+/* Text inputs */
+.text-input{width:100%;padding:14px 16px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid var(--card-border);color:var(--white);font-size:1rem;font-family:inherit;outline:none;transition:border-color .2s}
+.text-input::placeholder{color:var(--dark-gray)}
+.text-input:focus{border-color:var(--accent)}
+.text-input:disabled{opacity:.5}
+
+/* Day tabs */
+.day-tabs{display:flex;gap:8px;margin-bottom:18px}
+.day-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:14px 10px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid var(--card-border);cursor:pointer;transition:all .25s;text-align:center}
+.day-tab:hover{border-color:rgba(163,230,53,.25);background:rgba(163,230,53,.03)}
+.day-tab.active{border-color:var(--accent);background:var(--accent-dim);box-shadow:0 0 20px rgba(163,230,53,.08)}
+.day-tab-name{font-weight:800;font-size:.95rem;color:var(--white)}
+.day-tab.active .day-tab-name{color:var(--accent)}
+.day-tab-date{font-size:.78rem;color:var(--gray)}
+
+/* Time slot grid */
+.slots-panel{display:none}
+.slots-panel.active{display:block;animation:fadeIn .35s ease}
+.slot-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.slot{display:flex;align-items:center;gap:12px;padding:16px 16px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid var(--card-border);cursor:pointer;transition:all .25s}
+.slot:hover{border-color:rgba(163,230,53,.25);background:rgba(163,230,53,.03);transform:translateY(-1px)}
+.slot.selected{border-color:var(--accent);background:var(--accent-dim);box-shadow:0 0 20px rgba(163,230,53,.08)}
+.slot .radio{width:18px;height:18px;min-width:18px;border-radius:50%;border:2px solid var(--dark-gray);flex-shrink:0;position:relative;transition:border-color .2s}
+.slot.selected .radio{border-color:var(--accent)}
+.slot .radio::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--accent);transform:scale(0);transition:transform .15s}
+.slot.selected .radio::after{transform:scale(1)}
+.slot-info{flex:1;min-width:0}
+.slot-time{font-weight:800;font-size:.92rem;color:var(--white)}
+.slot.selected .slot-time{color:var(--accent)}
+.slot-status{font-size:.74rem;color:var(--gray);margin-top:1px}
+/* Taken / booked slot */
+.slot.taken{pointer-events:none;opacity:.55;background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.25)}
+.slot.taken .radio{border-color:var(--danger)}
+.slot.taken .slot-time{color:var(--gray);text-decoration:line-through;text-decoration-color:rgba(239,68,68,.6)}
+.slot.taken .slot-status{color:var(--danger);font-weight:700}
+/* Loading state for slots */
+.slots-loading{text-align:center;color:var(--gray);font-size:.85rem;padding:18px 0}
+.slots-loading .spinner-sm{display:inline-block;width:16px;height:16px;border:2px solid var(--card-border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px}
+
+/* Submit */
+.submit-wrap{text-align:center;padding:16px 0 40px}
+.btn-submit{padding:14px 44px;border:none;border-radius:10px;background:var(--accent);color:var(--bg);font-size:1rem;font-weight:800;font-family:inherit;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.btn-submit:hover{box-shadow:0 0 24px var(--accent-glow);transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-submit .spinner{display:none;width:20px;height:20px;border:3px solid rgba(11,15,26,.2);border-top-color:var(--bg);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+.btn-submit.loading .spinner{display:block}
+.btn-submit.loading .btn-text{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Results */
+.results{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:36px 24px;text-align:center;margin-bottom:40px;animation:fadeIn .4s ease}
+.success-icon{width:100px;height:100px;margin:0 auto 20px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:4px solid var(--correct);box-shadow:0 0 30px rgba(34,197,94,.15);font-size:2.8rem;animation:scaleIn .5s ease}
+.results.failed .success-icon{border-color:var(--danger);box-shadow:0 0 30px rgba(239,68,68,.15)}
+@keyframes scaleIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.result-title{font-size:1.3rem;font-weight:900;margin-bottom:6px}
+.result-sub{font-size:.9rem;color:var(--gray);line-height:1.6}
+.result-slot{display:inline-block;margin-top:14px;font-weight:800;color:var(--accent);background:var(--accent-dim);padding:8px 18px;border-radius:99px;font-size:.9rem}
+.submit-status{font-size:.85rem;color:var(--gray);margin-top:10px}
+.submit-status.success{color:var(--correct)}
+.submit-status.error{color:var(--danger)}
+
+/* Error message */
+.field-error{color:var(--danger);font-size:.8rem;margin-top:6px;display:none}
+.field-error.visible{display:block}
+
+/* Footer */
+.site-footer{background:var(--card);border:1px solid var(--card-border);border-radius:16px;padding:18px 20px;margin:6px 0 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;direction:ltr}
+.footer-brand{display:flex;align-items:center;gap:12px;min-width:0}
+.footer-brand img{height:36px;width:auto;display:block}
+.footer-divider{width:1px;height:34px;background:var(--dark-gray);flex-shrink:0}
+.footer-motto{font-family:'Inter',sans-serif;font-size:.84rem;color:var(--white);line-height:1.35;white-space:normal;max-width:340px}
+.footer-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.footer-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border:1px solid var(--card-border);border-radius:9px;background:rgba(255,255,255,.02);color:var(--white);font-size:.8rem;font-weight:700;font-family:'Inter',sans-serif;text-decoration:none;transition:all .2s}
+.footer-btn:hover{border-color:rgba(163,230,53,.35);background:var(--accent-dim);color:var(--accent)}
+
+.hidden{display:none!important}
+
+/* Responsive */
+@media(max-width:760px){
+  .site-footer{flex-direction:column;align-items:stretch}
+  .footer-actions{justify-content:flex-start}
+  .footer-motto{max-width:none}
+}
+@media(max-width:500px){
+  .hero{padding:24px 18px}
+  .field-card{padding:18px 16px}
+  .slot-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Nav -->
+  <nav class="nav"><div class="nav-logo"><img src="CyberKhana_text_logo.png" alt="CyberKhana"></div></nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-session">INTERVIEW BOOKING OPEN</div>
+    <h1>Book your <em>interview</em> slot</h1>
+    <div class="hero-sub">Pick the day and time that works for you. Each slot is 20 minutes — once a slot is booked, it's gone.</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-info"><span>PROGRESS</span><span id="pct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="pbar"></div></div>
+  </div>
+
+  <!-- Form Fields -->
+  <div id="formFields">
+
+    <!-- 1. Name -->
+    <div class="field-card" id="field-name" style="animation-delay:0s">
+      <div class="field-header">
+        <div class="field-num">1</div>
+        <div class="field-req">REQUIRED</div>
+      </div>
+      <div class="field-label">What is your full name?</div>
+      <input type="text" class="text-input" id="inputName" placeholder="e.g. Ahmed Ali Hussein" oninput="onFieldChange()">
+      <div class="field-error" id="errorName">Please enter your full name.</div>
+    </div>
+
+    <!-- 2. Interview date & time -->
+    <div class="field-card" id="field-slot" style="animation-delay:.05s">
+      <div class="field-header">
+        <div class="field-num">2</div>
+        <div class="field-req">REQUIRED</div>
+      </div>
+      <div class="field-label">Choose your interview date &amp; time</div>
+      <div class="field-sublabel">Select a day, then pick an available 20-minute slot. Booked slots are disabled.</div>
+
+      <!-- Day tabs -->
+      <div class="day-tabs" id="dayTabs"></div>
+
+      <!-- Slots loading state -->
+      <div class="slots-loading" id="slotsLoading"><span class="spinner-sm"></span>Loading available slots…</div>
+
+      <!-- Slot panels (one per day) -->
+      <div id="slotPanels" class="hidden"></div>
+
+      <div class="field-error" id="errorSlot">Please choose an available time slot.</div>
+    </div>
+
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-wrap" id="submitWrap">
+    <button class="btn-submit" id="submitBtn" disabled onclick="submitForm()">
+      <span class="btn-text">Confirm Booking</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+
+  <!-- Result -->
+  <div class="results hidden" id="results">
+    <div class="success-icon" id="resultIcon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--correct)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="result-title" id="resultTitle">Interview Booked!</div>
+    <div class="result-sub" id="resultSub">Your interview slot is reserved.<br>We'll see you then — keep an eye on your contact channel for any updates.</div>
+    <div class="result-slot hidden" id="resultSlot"></div>
+    <div class="submit-status" id="submitStatus"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <img src="logo1.png" alt="CyberKhana mark">
+      <div class="footer-divider"></div>
+      <div class="footer-motto">Revolutionizing the Iraqi Cybersecurity Education Landscape.</div>
+    </div>
+    <div class="footer-actions">
+      <a class="footer-btn" href="https://www.instagram.com/cyberkhana" target="_blank" rel="noopener noreferrer">Instagram</a>
+      <a class="footer-btn" href="https://t.me/cyberkhana" target="_blank" rel="noopener noreferrer">Telegram</a>
+      <a class="footer-btn" href="https://www.linkedin.com/company/cyberkhana/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a class="footer-btn" href="https://www.cyberkhana.tech" target="_blank" rel="noopener noreferrer">Website</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+// ============================================================
+// STEP: Paste your Google Apps Script Web App URL below:
+const SCRIPT_URL = "YOUR_SCRIPT_URL_HERE";
+// ============================================================
+
+// ---- Schedule definition --------------------------------------------------
+// Two interview days, 6 slots each, 20 minutes per slot, 9:00 PM -> 11:00 PM.
+const DAYS = [
+  { id: "29/6", name: "Day 1", date: "Sun, 29 June" },
+  { id: "30/6", name: "Day 2", date: "Mon, 30 June" }
+];
+
+// 6 slots of 20 minutes from 9:00 PM to 11:00 PM
+const SLOT_TIMES = [
+  "9:00 PM – 9:20 PM",
+  "9:20 PM – 9:40 PM",
+  "9:40 PM – 10:00 PM",
+  "10:00 PM – 10:20 PM",
+  "10:20 PM – 10:40 PM",
+  "10:40 PM – 11:00 PM"
+];
+
+// Build a unique key for a given day + time, used as the slot's identity.
+function slotKey(dayId, time) { return dayId + " | " + time; }
+
+// ---- State ----------------------------------------------------------------
+let selectedSlot = null;            // { dayId, time, key }
+let takenSlots = {};                // { key: true } for booked slots
+const TOTAL_FIELDS = 2;             // name, slot
+
+// ---- Build the UI ---------------------------------------------------------
+function buildUI() {
+  const tabs = document.getElementById('dayTabs');
+  const panels = document.getElementById('slotPanels');
+  tabs.innerHTML = '';
+  panels.innerHTML = '';
+
+  DAYS.forEach((day, di) => {
+    // Tab
+    const tab = document.createElement('div');
+    tab.className = 'day-tab' + (di === 0 ? ' active' : '');
+    tab.dataset.day = day.id;
+    tab.innerHTML = '<div class="day-tab-name">' + day.name + '</div><div class="day-tab-date">' + day.date + '</div>';
+    tab.onclick = () => switchDay(day.id);
+    tabs.appendChild(tab);
+
+    // Panel
+    const panel = document.createElement('div');
+    panel.className = 'slots-panel' + (di === 0 ? ' active' : '');
+    panel.dataset.day = day.id;
+
+    const grid = document.createElement('div');
+    grid.className = 'slot-grid';
+
+    SLOT_TIMES.forEach(time => {
+      const key = slotKey(day.id, time);
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      slot.dataset.key = key;
+      slot.dataset.day = day.id;
+      slot.dataset.time = time;
+      slot.innerHTML =
+        '<div class="radio"></div>' +
+        '<div class="slot-info">' +
+          '<div class="slot-time">' + time + '</div>' +
+          '<div class="slot-status">Available</div>' +
+        '</div>';
+      slot.onclick = () => pickSlot(slot);
+      grid.appendChild(slot);
+    });
+
+    panel.appendChild(grid);
+    panels.appendChild(panel);
+  });
+}
+
+function switchDay(dayId) {
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.toggle('active', t.dataset.day === dayId));
+  document.querySelectorAll('.slots-panel').forEach(p => p.classList.toggle('active', p.dataset.day === dayId));
+}
+
+function pickSlot(el) {
+  if (el.classList.contains('taken')) return;
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = { dayId: el.dataset.day, time: el.dataset.time, key: el.dataset.key };
+  updateProgress();
+}
+
+// Mark a slot as taken (booked) in the UI.
+function markTaken(key) {
+  const el = document.querySelector('.slot[data-key="' + cssEscape(key) + '"]');
+  if (!el) return;
+  el.classList.add('taken');
+  el.classList.remove('selected');
+  const status = el.querySelector('.slot-status');
+  if (status) status.textContent = 'Booked';
+}
+
+function cssEscape(s) { return s.replace(/"/g, '\\"'); }
+
+// Apply the taken map across all slots.
+function applyTaken() {
+  Object.keys(takenSlots).forEach(key => markTaken(key));
+  // If the currently selected slot just became taken, clear it.
+  if (selectedSlot && takenSlots[selectedSlot.key]) {
+    selectedSlot = null;
+    updateProgress();
+  }
+}
+
+// ---- Progress / validation ------------------------------------------------
+function countCompleted() {
+  let count = 0;
+  if (document.getElementById('inputName').value.trim().length >= 2) count++;
+  if (selectedSlot) count++;
+  return count;
+}
+
+function updateProgress() {
+  const count = countCompleted();
+  const pct = Math.round((count / TOTAL_FIELDS) * 100);
+  document.getElementById('pbar').style.width = pct + '%';
+  document.getElementById('pct').textContent = pct + '%';
+
+  updateCardState('field-name', document.getElementById('inputName').value.trim().length >= 2);
+  updateCardState('field-slot', !!selectedSlot);
+
+  document.getElementById('submitBtn').disabled = count < TOTAL_FIELDS;
+}
+
+function updateCardState(cardId, completed) {
+  document.getElementById(cardId).classList.toggle('completed', !!completed);
+}
+
+function onFieldChange() { updateProgress(); }
+
+function showError(id) {
+  document.getElementById(id).classList.add('visible');
+  setTimeout(() => document.getElementById(id).classList.remove('visible'), 3000);
+}
+
+// ---- Load taken slots from the backend ------------------------------------
+function loadTakenSlots() {
+  const loading = document.getElementById('slotsLoading');
+  const panels = document.getElementById('slotPanels');
+
+  function reveal() {
+    loading.classList.add('hidden');
+    panels.classList.remove('hidden');
+  }
+
+  if (SCRIPT_URL === "YOUR_SCRIPT_URL_HERE") {
+    // Not connected yet — show all as available.
+    reveal();
+    return;
+  }
+
+  fetch(SCRIPT_URL + '?action=taken', { method: 'GET' })
+    .then(r => r.json())
+    .then(data => {
+      takenSlots = {};
+      (data.taken || []).forEach(k => { takenSlots[k] = true; });
+      applyTaken();
+      reveal();
+    })
+    .catch(() => {
+      // On error, fail open (show all available) so booking still works.
+      reveal();
+    });
+}
+
+// ---- Submit ---------------------------------------------------------------
+function submitForm() {
+  const name = document.getElementById('inputName').value.trim();
+
+  if (!name || name.length < 2) {
+    showError('errorName');
+    document.getElementById('inputName').focus();
+    return;
+  }
+  if (!selectedSlot) {
+    showError('errorSlot');
+    return;
+  }
+
+  const data = {
+    name: name,
+    day: selectedSlot.dayId,
+    time: selectedSlot.time,
+    slotKey: selectedSlot.key,
+    timestamp: new Date().toISOString()
+  };
+
+  const btn = document.getElementById('submitBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  document.querySelectorAll('.text-input').forEach(i => i.disabled = true);
+  document.querySelectorAll('.slot, .day-tab').forEach(o => o.style.pointerEvents = 'none');
+
+  if (SCRIPT_URL === "YOUR_SCRIPT_URL_HERE") {
+    showResult('warn', '⚠️ Google Sheet not connected yet', selectedSlot);
+    return;
+  }
+
+  // We need the server's JSON response to know if the slot was still free,
+  // so we use a normal CORS request (Apps Script returns JSON).
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(data)
+  })
+    .then(r => r.json())
+    .then(res => {
+      if (res.status === 'success') {
+        showResult('success', '✓ Your interview slot has been reserved', selectedSlot);
+      } else if (res.status === 'taken') {
+        // Someone grabbed it first — re-enable and mark it taken.
+        takenSlots[selectedSlot.key] = true;
+        showResult('taken', '✗ That slot was just booked by someone else', selectedSlot);
+      } else {
+        showResult('error', '✗ ' + (res.message || 'Booking failed — please try again'), selectedSlot);
+      }
+    })
+    .catch(() => {
+      showResult('error', '✗ Booking failed — please try again', selectedSlot);
+    });
+}
+
+function showResult(kind, message, slot) {
+  const btn = document.getElementById('submitBtn');
+  btn.classList.remove('loading');
+
+  const results = document.getElementById('results');
+  const icon = document.getElementById('resultIcon');
+  const title = document.getElementById('resultTitle');
+  const sub = document.getElementById('resultSub');
+  const slotBadge = document.getElementById('resultSlot');
+  const status = document.getElementById('submitStatus');
+
+  if (kind === 'success') {
+    results.classList.remove('failed');
+    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--correct)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><polyline points="20 6 9 17 4 12"/></svg>';
+    title.textContent = 'Interview Booked!';
+    sub.innerHTML = "Your interview slot is reserved.<br>We'll see you then — keep an eye on your contact channel for any updates.";
+    slotBadge.textContent = slot.dayId + '  •  ' + slot.time;
+    slotBadge.classList.remove('hidden');
+    status.textContent = message;
+    status.className = 'submit-status success';
+    document.getElementById('submitWrap').classList.add('hidden');
+  } else if (kind === 'taken') {
+    results.classList.add('failed');
+    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    title.textContent = 'Slot No Longer Available';
+    sub.innerHTML = 'Someone booked this slot just before you.<br>Please go back and choose another available time.';
+    slotBadge.classList.add('hidden');
+    status.textContent = message;
+    status.className = 'submit-status error';
+    // Let them try again with a different slot.
+    setTimeout(() => {
+      results.classList.add('hidden');
+      results.classList.remove('failed');
+      document.getElementById('submitWrap').classList.remove('hidden');
+      document.querySelectorAll('.text-input').forEach(i => i.disabled = false);
+      document.querySelectorAll('.slot, .day-tab').forEach(o => o.style.pointerEvents = '');
+      applyTaken();
+      selectedSlot = null;
+      updateProgress();
+    }, 2600);
+  } else if (kind === 'warn') {
+    results.classList.remove('failed');
+    title.textContent = 'Demo Mode';
+    sub.innerHTML = 'The form looks great — connect your Google Sheet to start recording real bookings.';
+    slotBadge.textContent = slot.dayId + '  •  ' + slot.time;
+    slotBadge.classList.remove('hidden');
+    status.textContent = message;
+    status.className = 'submit-status error';
+    document.getElementById('submitWrap').classList.add('hidden');
+  } else {
+    results.classList.add('failed');
+    icon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    title.textContent = 'Something Went Wrong';
+    sub.innerHTML = 'We could not record your booking.<br>Please try again in a moment.';
+    slotBadge.classList.add('hidden');
+    status.textContent = message;
+    status.className = 'submit-status error';
+    btn.disabled = false;
+    document.querySelectorAll('.text-input').forEach(i => i.disabled = false);
+    document.querySelectorAll('.slot, .day-tab').forEach(o => o.style.pointerEvents = '');
+  }
+
+  results.classList.remove('hidden');
+  results.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ---- Init -----------------------------------------------------------------
+buildUI();
+loadTakenSlots();
+updateProgress();
+</script>
+</body>
+</html>
